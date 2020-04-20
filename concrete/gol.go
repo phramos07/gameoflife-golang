@@ -1,9 +1,11 @@
 package concrete
 
 import (
+	"bufio"
 	"fmt"
 	abstraction "gol/abstraction"
 	"math/rand"
+	"os"
 	"time"
 )
 
@@ -14,18 +16,43 @@ type Gol struct {
 	factor float32
 }
 
-func NewGol(lines int, cols int, factor int) abstraction.IGol {
-	lives := make([][]abstraction.ILife, cols)
+func buildMatrix(lines int, cols int) [][]abstraction.ILife {
+	lives := make([][]abstraction.ILife, lines)
 	for i := range lives {
-		lives[i] = make([]abstraction.ILife, lines)
+		lives[i] = make([]abstraction.ILife, cols)
 		for j := range lives[i] {
 			lives[i][j] = NewLife()
 		}
 	}
 
+	return lives
+}
+
+func NewGol(lines int, cols int, factor int) abstraction.IGol {
+	lives := buildMatrix(lines, cols)
+
 	return &Gol{
 		lives:  lives,
 		factor: float32(factor) / 100,
+	}
+}
+
+func (g *Gol) StartFromFile(filepath string) {
+	f, err := os.Open(filepath)
+	if err != nil {
+		panic(err)
+	}
+	reader := bufio.NewReader(f)
+
+	var p string
+	for i := 0; i < len(g.lives); i++ {
+		fmt.Fscanf(reader, "%s\n", &p)
+		for pos, char := range p {
+			if pos <= len(g.lives[i]) && string(char) == "1" {
+				g.lives[i][pos].Toggle()
+			}
+		}
+		fmt.Fscan(reader, "\n")
 	}
 }
 
@@ -43,10 +70,16 @@ func (g *Gol) Start() {
 }
 
 func (g *Gol) Next() {
+
+	nextLives := make([][]abstraction.ILife, len(g.lives))
+
 	for i := range g.lives {
+		nextLives[i] = make([]abstraction.ILife, len(g.lives[i]))
 		for j := range g.lives[i] {
-			aliveNeighbors := 0
 			current := g.lives[i][j]
+			nextLives[i][j] = current.NewFrom(current)
+
+			aliveNeighbors := 0
 
 			prev_i := i - 1
 			if prev_i < 0 {
@@ -93,14 +126,23 @@ func (g *Gol) Next() {
 				aliveNeighbors++
 			}
 
+			next := nextLives[i][j]
 			if current.GetStatus() {
-				current.Toggle()
+				next.Toggle()
 				if aliveNeighbors == 2 || aliveNeighbors == 3 {
-					current.Toggle()
+					next.Toggle()
 				}
 			} else if aliveNeighbors == 3 {
-				current.Toggle()
+				next.Toggle()
 			}
+		}
+	}
+
+	g.lives = nextLives
+	for i := range g.lives {
+		g.lives[i] = nextLives[i]
+		for j := range g.lives[i] {
+			g.lives[i][j] = nextLives[i][j]
 		}
 	}
 }
