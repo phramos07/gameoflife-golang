@@ -16,6 +16,12 @@ func NewLife() abstraction.ILife {
 	}
 }
 
+func (l *Life) NewFrom(other abstraction.ILife) abstraction.ILife {
+	return &Life{
+		status: other.GetStatus(),
+	}
+}
+
 func (l *Life) GetStatus() bool {
 	return l.status
 }
