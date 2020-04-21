@@ -1,17 +1,35 @@
 package main
 
 import (
+	"flag"
 	concrete "gol/concrete"
-	"time"
 )
 
+var DEFAULT_ROWS_SIZE int = 5
+var DEFAULT_COLS_SIZE int = 5
+var DEFAULT_FILE_PATH string = ""
+var DEFAULT_FACTOR int = 5
+
 func main() {
-	gol := concrete.NewGol(180, 50, 6)
-	gol.Start()
+
+	rows := flag.Int("rows", DEFAULT_ROWS_SIZE, "Number of rows.")
+	cols := flag.Int("cols", DEFAULT_COLS_SIZE, "Number of columns.")
+	factor := flag.Int("factor", DEFAULT_FACTOR, "Factor for initial Matrix generation (0 - 100)")
+	filepath := flag.String("filepath", DEFAULT_FILE_PATH, "Absolute file path.")
+
+	flag.Parse()
+
+	gol := concrete.NewGol(*rows, *cols, *factor)
+
+	if *filepath == "" {
+		gol.Start()
+	} else {
+		gol.StartFromFile(*filepath)
+	}
+
 	for {
-		ClearScreen()
 		gol.Print()
 		gol.Next()
-		time.Sleep(1 * time.Second / 10)
+		ClearScreen()
 	}
 }
