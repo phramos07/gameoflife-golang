@@ -3,5 +3,5 @@ package abstraction
 type ILife interface {
 	Toggle()
 	GetStatus() bool
-	NewFrom(other ILife) ILife
+	NewFrom(other interface{}) ILife
 }

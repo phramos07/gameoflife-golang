@@ -5,10 +5,13 @@ import (
 	concrete "gol/concrete"
 )
 
-var DEFAULT_ROWS_SIZE int = 5
-var DEFAULT_COLS_SIZE int = 5
-var DEFAULT_FILE_PATH string = ""
-var DEFAULT_FACTOR int = 5
+/*Constants loaded when respective arg is not passed*/
+const (
+	DEFAULT_ROWS_SIZE int    = 5
+	DEFAULT_COLS_SIZE int    = 5
+	DEFAULT_FILE_PATH string = ""
+	DEFAULT_FACTOR    int    = 5
+)
 
 func main() {
 

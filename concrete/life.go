@@ -16,9 +16,14 @@ func NewLife() abstraction.ILife {
 	}
 }
 
-func (l *Life) NewFrom(other abstraction.ILife) abstraction.ILife {
-	return &Life{
-		status: other.GetStatus(),
+func (l *Life) NewFrom(other interface{}) abstraction.ILife {
+	switch life := other.(type) {
+	case abstraction.ILife:
+		return &Life{
+			status: life.GetStatus(),
+		}
+	default:
+		panic("Couldn't create new life from provided object.")
 	}
 }
 
